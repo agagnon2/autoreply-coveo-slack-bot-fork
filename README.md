@@ -6,7 +6,7 @@ This project describes how to integrate Coveo auto-answering capabilities in Sla
 * __Coveo platform__ - hosts the index and organization for your data, provides the search capabilities.
 * __Coveo Impersonation__ - key for the authentication against the platform.
 * __Slack Admin__ access to add a new Application.
-* __AWS Lamda__ - runs your NodeJs code that will interact with the coveo platform without provisioning or managing infrastructure.
+* __AWS Lambda__ - runs your NodeJs code that will interact with the coveo platform without provisioning or managing infrastructure.
 * __AWS DynamoDB__- stores the search token cache (the cache consists of: visitorId, searchToken and expiration date).
 * __AWS API Gateway__, - points to the above AWS Lambda function.
 
@@ -15,7 +15,7 @@ This project describes how to integrate Coveo auto-answering capabilities in Sla
 ## How it works
 
 In Slack, in a channel where the bot will have been previously added, users asking a question will receive an answer based on the top Coveo Search answers.
-Slack will send the message to the AWS Lamda code, which will confirm it's a question, and if so, will send a query to Coveo based on the keywords in the intent.
+Slack will send the message to the AWS Lambda code, which will confirm it's a question, and if so, will send a query to Coveo based on the keywords in the intent.
 The top results are returned to Slack.
 
 

@@ -31,10 +31,6 @@ const params = {
     console.log(e);
 });
 
-const setupHeadless = () => {
-
-}
-
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "hello"
     app.message('?', async ({ message, say }) => {

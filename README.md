@@ -1,4 +1,4 @@
-# Coveo auto-reply integration with Slack
+# Coveo auto-reply integration with Slack (currently WIP)
 This project describes how to integrate Coveo auto-answering capabilities in Slack.
 
 

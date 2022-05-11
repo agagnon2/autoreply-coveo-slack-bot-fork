@@ -1,11 +1,18 @@
 const AWS = require('aws-sdk');
 const { App } = require('@slack/bolt');
 require('dotenv').config('.env');
+const request = require('request-promise');
 
 // AWS constant
 const params = {
     TableName: process.env.TABLE_NAME,
     Key: { user: process.env.PARTITION_KEY_VALUE },
+};
+
+// Slack message configuration 
+const slackConfig = {
+    TITLE_MAX_LENGTH: 100,
+    EXCERP_MAX_LENGTH: 180
 };
 
 (async () => {
@@ -23,6 +30,7 @@ const params = {
         appToken: data.Item.SLACK_APP_TOKEN,
     });
 
+
     await setupListenner(app);
 
     await app.start(process.env.PORT || 3000);
@@ -32,14 +40,63 @@ const params = {
 });
 
 const setupListenner = async (app) => {
-    // Listens to incoming messages that contain "hello"
+    // Listens to incoming messages that contain "?"
     app.message('?', async ({ message, say }) => {
-        // say() sends a message to the channel where the event was triggered
-        await say(`Hey there <@${message.user}>! You seem to be asking a question. Let me answer it the best I can! \nThe top 3 answer for your question *${message.text}*: \n
-            1- Sometimes I’ll start a sentence and I don’t even know where it’s going. I just hope I find it along the way.\n
-            2- To the guy who invented zero, thanks for nothing.\n
-            3- What kind of concert only costs 45 cents? A 50 Cent concert featuring Nickelback.`);
-    });
+        const results = JSON.parse(await getCoveoSearchResults(message, message.text)).results.map((result) => {
+            return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
+            \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
+        });
 
-    // Start your app
+        await say({
+            text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
+            thread_ts: message.ts
+        })
+    });//
+};
+const truncate = (str, num) => {
+    if (str.length <= num) {
+        return str
+    }
+    return str.slice(0, num) + '...'
+}
+
+const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
+    const endPoint = `${process.env.COVEO_ENDPOINT}/rest/search/v2/?organizationId=${process.env.COVEO_ORG}`;
+    let searchBody = {
+        "q": query,
+        "fieldsToInclude": [
+            "clickableuri",
+            "title",
+            "date",
+            "excerpt",
+        ],
+        "fieldsToExclude": [
+            "documenttype",
+            "size"
+        ],
+        "debug": false,
+        "numberOfResults": numberOfResults,
+        "pipeline": process.env.COVEO_PIPELINE,
+        "context": {
+            "userName": message.user,
+        },
+        "facets": []
+    };
+    return request({
+        "method": "POST",
+        "url": endPoint,
+        headers: {
+            'accept': 'application/json',
+            'Authorization': 'Bearer ' + process.env.COVEO_API_KEY,
+            'Content-Type': 'application/json'
+        },
+        "body": JSON.stringify(searchBody)
+    },
+        (err, httpResponse, body) => {
+            if (err) {
+                console.log('ERROR: ', err);
+                throw new Error(`getCoveoResults failed: "${err}"`);
+            }
+            console.log('getCoveoResults response code: ', httpResponse.statusCode);
+        })
 };

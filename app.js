@@ -30,7 +30,6 @@ const slackConfig = {
         appToken: data.Item.SLACK_APP_TOKEN,
     });
 
-
     await setupListenner(app);
 
     await app.start(process.env.PORT || 3000);

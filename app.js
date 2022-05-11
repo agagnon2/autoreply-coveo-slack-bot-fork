@@ -44,12 +44,14 @@ const setupListenner = async (app) => {
         const results = JSON.parse(await getCoveoSearchResults(message, message.text)).results.map((result) => {
             return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
             \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
-        });
+        }) || null;
 
-        await say({
-            text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
-            thread_ts: message.ts
-        })
+        if (results && results != "") {
+            await say({
+                text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
+                thread_ts: message.ts
+            })
+        }
     });//
 };
 const truncate = (str, num) => {
@@ -74,6 +76,7 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
             "size"
         ],
         "debug": false,
+        "viewAllContent": true,
         "numberOfResults": numberOfResults,
         "pipeline": process.env.COVEO_PIPELINE,
         "context": {

@@ -4,7 +4,8 @@
   "description": "This project describes how to integrate Coveo auto-answering capabilities in Slack.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
     "@slack/socket-mode": "^1.3.0",
     "aws-sdk": "^2.1131.0",
     "dotenv": "^16.0.0",
+    "nodemon": "^2.0.16",
     "request-promise": "^4.2.6"
   },
   "devDependencies": {

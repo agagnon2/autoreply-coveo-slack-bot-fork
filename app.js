@@ -30,6 +30,7 @@ const slackConfig = {
         appToken: data.Item.SLACK_APP_TOKEN,
     });
 
+    // Wait for a question mark 
     await setupListenner(app);
 
     await app.start(process.env.PORT || 3000);
@@ -41,10 +42,7 @@ const slackConfig = {
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "?"
     app.message('?', async ({ message, say }) => {
-        const results = JSON.parse(await getCoveoSearchResults(message, message.text)).results.map((result) => {
-            return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
-            \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
-        }) || null;
+        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text))
 
         if (results && results != "") {
             await say({
@@ -54,6 +52,15 @@ const setupListenner = async (app) => {
         }
     });//
 };
+
+const formatCoveoResults = (searchResultResponse) => {
+    const results = JSON.parse(searchResultResponse);
+    return results.results.map((result) => {
+        return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
+            \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
+    }) || null;
+}
+
 const truncate = (str, num) => {
     if (str.length <= num) {
         return str

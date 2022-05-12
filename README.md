@@ -3,11 +3,11 @@ This project describes how to integrate Coveo auto-answering capabilities in Sla
 
 
 ## Components
-* __Coveo platform__ - hosts the index and organization for your data, provides the search capabilities.
+* __Coveo platform__ - hosts the index and organization for your data, provides search capabilities.
 * __Coveo Impersonation__ - key for the authentication against the platform.
 * __Slack Admin__ access to add a new Application.
-* __AWS Lambda__ - runs your NodeJs code that will interact with the coveo platform without provisioning or managing infrastructure.
-* __AWS DynamoDB__- stores the search token cache (the cache consists of: visitorId, searchToken and expiration date).
+* __AWS Lambda__ - runs your NodeJs code that will interact with the Coveo platform without provisioning or managing infrastructure.
+* __AWS DynamoDB__- stores the search token cache (the cache consists of: Slack app token, slack bot token and slack signing secret).
 * __AWS API Gateway__, - points to the above AWS Lambda function.
 
 
@@ -28,10 +28,12 @@ The top results are returned to Slack.
 
    **_Keep that key private!!!_**
 
-   Insert it only in the `.env` file (`COVEO_API_KEY`). Also put the `COVEO_ORG` in the `.env` file.
+   Insert it only in the `.env` file (`COVEO_API_KEY`). Also, put the `COVEO_ORG` in the `.env` file.
 
 ### Create DynamoDB table
-
+  * Insert the region you are using AWS in the `.env` file (`COVEO_AWS_REGION`).
+  * Insert the Table Name you created in the `.env` file (`TABLE_NAME`). 
+  * Insert the Partition key value you created in the `.env` file (`PARTITION_KEY_VALUE`). 
  _More to come_
 ### Create a Slack app
 
@@ -42,10 +44,14 @@ The top results are returned to Slack.
 5. Disable the `Messages Tab`.
 6. Navigate to `Basic Information`.
 7. Navigate to `App Credentials`.
-8. Show the `Signing Secret` and store it in the `.env` file as `SLACK_SIGNING_SECRET`.
-9. Navigate to `OAuth & Permissions`.
-10. Show the `Bot User OAuth Token` and store it in the `.env` file as `SLACK_BOT_TOKEN`.
-11. Enable the following permissions at the `Scopes` section:
+8. Show the `Signing Secret` and store it in your DynamoDB table. For this example, we used `SLACK_SIGNING_SECRET` as the attribute name.
+9.  Navigate to `App-Level Tokens`.
+10. Click on `Generate Token and Scopes` 
+11. Add both `connections:write` and `authorization:read` scopes to your token. Give it a name and Generate it
+12. When done, it should display the token. Copy it and store it in your DynamoDB table. For this example, we used `SLACK_APP_TOKEN` as the attribute name.
+13. Navigate to `OAuth & Permissions`.
+14. Copy the `Bot User OAuth Token` under the `OAuth Tokens for Your Workspace` section and store them in your DynamoDB table. For this example, we used `SLACK_BOT_TOKEN` as the attribute name.
+15. Enable the following permissions in the `Scopes`` section:
 - Channels:history
 - Commands
 - Groups:history

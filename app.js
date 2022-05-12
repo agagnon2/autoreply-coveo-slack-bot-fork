@@ -28,7 +28,7 @@ const slackConfig = {
         signingSecret: data.Item.SLACK_SIGNING_SECRET,
         socketMode: true,
         appToken: data.Item.SLACK_APP_TOKEN,
-    });
+    })
 
     // Wait for a question mark 
     await setupListenner(app);
@@ -49,8 +49,8 @@ const setupListenner = async (app) => {
                 text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
                 thread_ts: message.ts
             })
-        }
-    });//
+        };
+    });
 };
 
 const formatCoveoResults = (searchResultResponse) => {
@@ -67,7 +67,6 @@ const truncate = (str, num) => {
     }
     return str.slice(0, num) + '...'
 }
-
 
 const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
     const endPoint = `${process.env.COVEO_ENDPOINT}/rest/search/v2/?organizationId=${process.env.COVEO_ORG}`;

@@ -68,6 +68,7 @@ const truncate = (str, num) => {
     return str.slice(0, num) + '...'
 }
 
+
 const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
     const endPoint = `${process.env.COVEO_ENDPOINT}/rest/search/v2/?organizationId=${process.env.COVEO_ORG}`;
     let searchBody = {
@@ -85,7 +86,6 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         "debug": false,
         "viewAllContent": true,
         "numberOfResults": numberOfResults,
-        "pipeline": process.env.COVEO_PIPELINE,
         "context": {
             "userName": message.user,
         },

@@ -1,12 +1,14 @@
 service: coveo-slack-integration
-frameworkVersion: '1'
+frameworkVersion: '3'
 provider:
   name: aws
-  runtime: nodejs12.x  # could be changed to v14 (current LTS) or v16 (current Latest)
+  runtime: nodejs14.x
   environment:
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+    SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
 functions:
   slack:
-    handler: index.handler
+    handler: lambdaApp.handler
     events:
       - http:
           path: slack/events

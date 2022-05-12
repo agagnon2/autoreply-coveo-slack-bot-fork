@@ -1,11 +1,12 @@
 {
-  "name": "autoreply-coveo-slack-bot",
+  "name": "auto-reply-app-serverless",
   "version": "1.0.0",
   "description": "This project describes how to integrate Coveo auto-answering capabilities in Slack.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js"
+    "dev": "nodemon socketApp.js",
+    "dev:lambda": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0"
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "serverless-offline": "^8.5.0"
   }
 }

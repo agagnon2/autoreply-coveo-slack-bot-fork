@@ -28,8 +28,9 @@ const slackConfig = {
         signingSecret: data.Item.SLACK_SIGNING_SECRET,
         socketMode: true,
         appToken: data.Item.SLACK_APP_TOKEN,
-    });
+    })
 
+    // Wait for a question mark 
     await setupListenner(app);
 
     await app.start(process.env.PORT || 3000);
@@ -41,17 +42,25 @@ const slackConfig = {
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "?"
     app.message('?', async ({ message, say }) => {
-        const results = JSON.parse(await getCoveoSearchResults(message, message.text)).results.map((result) => {
-            return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
-            \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
-        });
+        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text))
 
-        await say({
-            text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
-            thread_ts: message.ts
-        })
-    });//
+        if (results && results != "") {
+            await say({
+                text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
+                thread_ts: message.ts
+            })
+        };
+    });
 };
+
+const formatCoveoResults = (searchResultResponse) => {
+    const results = JSON.parse(searchResultResponse);
+    return results.results.map((result) => {
+        return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
+            \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
+    }) || null;
+}
+
 const truncate = (str, num) => {
     if (str.length <= num) {
         return str
@@ -74,8 +83,8 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
             "size"
         ],
         "debug": false,
+        "viewAllContent": true,
         "numberOfResults": numberOfResults,
-        "pipeline": process.env.COVEO_PIPELINE,
         "context": {
             "userName": message.user,
         },

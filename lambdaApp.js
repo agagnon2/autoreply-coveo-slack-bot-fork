@@ -3,8 +3,6 @@ const { App, AwsLambdaReceiver } = require('@slack/bolt');
 const request = require('request-promise');
 require("dotenv").config()
 
-console.log("before all")
-
 // AWS constant
 const params = {
     TableName: 'awsSlackCache',
@@ -69,6 +67,7 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         "debug": false,
         "viewAllContent": true,
         "numberOfResults": numberOfResults,
+        "pipeline": process.env.COVEO_PIPELINE,
         "context": {
             "userName": message.user,
         },
@@ -89,7 +88,6 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
                 console.log('ERROR: ', err);
                 throw new Error(`getCoveoResults failed: "${err}"`);
             }
-            console.log('getCoveoResults response code: ', httpResponse.statusCode);
         })
 };
 

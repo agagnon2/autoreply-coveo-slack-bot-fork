@@ -104,4 +104,4 @@ dist
 .tern-port
 
 # deployment package
-.lambdaDeployment
+lambdaDeployment/*

@@ -15,29 +15,7 @@ const slackConfig = {
     EXCERP_MAX_LENGTH: 180
 };
 
-(async () => {
-    // Getting the AWS table containing our app info
-    const ddbDocClient = new AWS.DynamoDB.DocumentClient();
-    AWS.config.update({ region: process.env.COVEO_AWS_REGION });
 
-    const data = await ddbDocClient.get(params).promise();
-
-    // Initialize the app with the proper tokens
-    const app = new App({
-        token: data.Item.SLACK_BOT_TOKEN,
-        signingSecret: data.Item.SLACK_SIGNING_SECRET,
-        socketMode: true,
-        appToken: data.Item.SLACK_APP_TOKEN,
-    })
-
-    // Wait for a question mark 
-    await setupListenner(app);
-
-    await app.start(process.env.PORT || 3000);
-    console.log("⚡️ Bolt app is running!");
-})().catch((e) => {
-    console.log(e);
-});
 
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "?"
@@ -85,6 +63,7 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         "debug": false,
         "viewAllContent": true,
         "numberOfResults": numberOfResults,
+        "pipeline": process.env.COVEO_PIPELINE || "default",
         "context": {
             "userName": message.user,
         },
@@ -106,5 +85,25 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
                 throw new Error(`getCoveoResults failed: "${err}"`);
             }
             console.log('getCoveoResults response code: ', httpResponse.statusCode);
+            // Uncomment is you wan to see the result body
+            // console.log('getCoveoResults response body: ', httpResponse.body);
         })
 };
+
+(async () => {
+    // Initialize the app with the proper tokens
+    const app = new App({
+        token: process.env.SLACK_BOT_TOKEN,
+        signingSecret: process.env.SLACK_SIGNING_SECRET,
+        socketMode: true,
+        appToken: process.env.SLACK_APP_TOKEN,
+    })
+
+    // Wait for a question mark 
+    await setupListenner(app);
+
+    await app.start(process.env.PORT || 3000);
+    console.log("⚡️ Bolt app is running!");
+})().catch((e) => {
+    console.log(e);
+});

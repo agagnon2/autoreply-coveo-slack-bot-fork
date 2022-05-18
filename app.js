@@ -4,10 +4,10 @@ require('dotenv').config('.env');
 const request = require('request-promise');
 
 // AWS constant
-const params = {
-    TableName: process.env.TABLE_NAME,
-    Key: { user: process.env.PARTITION_KEY_VALUE },
-};
+const smValuePrefix = '/rd/coveo-autoreply-bot/'
+const ssmClient = new AWS.SSM({
+    region: process.env.COVEO_AWS_REGION
+});
 
 // Slack message configuration 
 const slackConfig = {
@@ -90,13 +90,26 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         })
 };
 
+const getSsmParam = async (name) => {
+    return (await ssmClient.getParameter({
+        Name: smValuePrefix + name,
+        WithDecryption: true,
+    }).promise()).Parameter.Value
+}
+
+
 (async () => {
+    // Get the tokens from the param store
+    const SLACK_BOT_TOKEN = await getSsmParam('SLACK_BOT_TOKEN')
+    const SLACK_SIGNING_SECRET = await getSsmParam('SLACK_SIGNING_SECRET')
+    const SLACK_APP_TOKEN = await getSsmParam('SLACK_APP_TOKEN')
+
     // Initialize the app with the proper tokens
     const app = new App({
-        token: process.env.SLACK_BOT_TOKEN,
-        signingSecret: process.env.SLACK_SIGNING_SECRET,
+        token: SLACK_BOT_TOKEN,
+        signingSecret: SLACK_SIGNING_SECRET,
         socketMode: true,
-        appToken: process.env.SLACK_APP_TOKEN,
+        appToken: SLACK_APP_TOKEN,
     })
 
     // Wait for a question mark 

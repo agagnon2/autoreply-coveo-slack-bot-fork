@@ -4,10 +4,11 @@ const request = require('request-promise');
 require("dotenv").config()
 
 // AWS constant
-const params = {
-    TableName: 'awsSlackCache',
-    Key: { user: 'Auto reply coveo bot' },
-};
+const smValuePrefix = '/rd/coveo-autoreply-bot/'
+const ssmClient = new AWS.SSM({
+    region: process.env.COVEO_AWS_REGION
+});
+
 
 // Initialize your custom receiver
 const awsLambdaReceiver = new AwsLambdaReceiver({
@@ -24,14 +25,23 @@ const slackConfig = {
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "?"
     app.message('?', async ({ message, say }) => {
-        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text))
+        const COVEO_API_KEY = await getSsmParam('COVEO_API_KEY')
+        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text, COVEO_API_KEY))
+
 
         if (results && results != "") {
             await say({
                 text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
                 thread_ts: message.ts
             })
-        };
+        } else {
+            await ack({
+                "response_action": "errors",
+                errors: {
+                    "search_sentence": "Sorry, this isn’t a valid question"
+                }
+            });
+        }
     });
 };
 
@@ -50,7 +60,7 @@ const truncate = (str, num) => {
     return str.slice(0, num) + '...'
 }
 
-const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
+const getCoveoSearchResults = (message, query, COVEO_API_KEY, numberOfResults = 3) => {
     const endPoint = `${process.env.COVEO_ENDPOINT}/rest/search/v2/?organizationId=${process.env.COVEO_ORG}`;
     let searchBody = {
         "q": query,
@@ -67,7 +77,7 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         "debug": false,
         "viewAllContent": true,
         "numberOfResults": numberOfResults,
-        "pipeline": process.env.COVEO_PIPELINE,
+        "pipeline": process.env.COVEO_PIPELINE || "default",
         "context": {
             "userName": message.user,
         },
@@ -78,7 +88,7 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         "url": endPoint,
         headers: {
             'accept': 'application/json',
-            'Authorization': 'Bearer ' + process.env.COVEO_API_KEY,
+            'Authorization': 'Bearer ' + COVEO_API_KEY,
             'Content-Type': 'application/json'
         },
         "body": JSON.stringify(searchBody)
@@ -91,10 +101,20 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         })
 };
 
+const getSsmParam = async (name) => {
+    return (await ssmClient.getParameter({
+        Name: smValuePrefix + name,
+        WithDecryption: true,
+    }).promise()).Parameter.Value
+}
+
 (async () => {
+    // Get the tokens from the param store
+    const SLACK_BOT_TOKEN = await getSsmParam('SLACK_BOT_TOKEN')
+
     // Initialize the app with the proper tokens
     const app = new App({
-        token: process.env.SLACK_BOT_TOKEN,
+        token: SLACK_BOT_TOKEN,
         receiver: awsLambdaReceiver,
     })
 

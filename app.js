@@ -16,7 +16,6 @@ const slackConfig = {
 };
 
 
-
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "?"
     app.message('?', async ({ message, say }) => {
@@ -96,7 +95,6 @@ const getSsmParam = async (name) => {
         WithDecryption: true,
     }).promise()).Parameter.Value
 }
-
 
 (async () => {
     // Get the tokens from the param store

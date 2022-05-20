@@ -15,18 +15,25 @@ const slackConfig = {
     EXCERP_MAX_LENGTH: 180
 };
 
-
 const setupListenner = async (app) => {
-    // Listens to incoming messages that contain "?"
+    // Listens to incoming messages that contain '?'
     app.message('?', async ({ message, say }) => {
-        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text))
+        const COVEO_API_KEY = await getSsmParam('COVEO_API_KEY')
+        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text, COVEO_API_KEY))
 
-        if (results && results != "") {
+        if (results && results != '') {
             await say({
                 text: `Hi, I'm a bot :robot_face:. Here are the best results I found on the Coveo platform :\n\n${results.join('\n')}`,
                 thread_ts: message.ts
             })
-        };
+        } else {
+            await ack({
+                'response_action': 'errors',
+                errors: {
+                    'search_sentence': 'Sorry, this isn’t a valid question'
+                }
+            });
+        }
     });
 };
 
@@ -34,7 +41,7 @@ const formatCoveoResults = (searchResultResponse) => {
     const results = JSON.parse(searchResultResponse);
     return results.results.map((result) => {
         return `• *<${result.uri}|${truncate(result.title, slackConfig.TITLE_MAX_LENGTH)}>* :
-            \n_${truncate(result.excerpt || "", slackConfig.EXCERP_MAX_LENGTH)}_`
+            \n_${truncate(result.excerpt || '', slackConfig.EXCERP_MAX_LENGTH)}_`
     }) || null;
 }
 
@@ -45,47 +52,44 @@ const truncate = (str, num) => {
     return str.slice(0, num) + '...'
 }
 
-const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
+const getCoveoSearchResults = (message, query, COVEO_API_KEY, numberOfResults = 3) => {
     const endPoint = `${process.env.COVEO_ENDPOINT}/rest/search/v2/?organizationId=${process.env.COVEO_ORG}`;
     let searchBody = {
-        "q": query,
-        "fieldsToInclude": [
-            "clickableuri",
-            "title",
-            "date",
-            "excerpt",
+        'q': query,
+        'fieldsToInclude': [
+            'clickableuri',
+            'title',
+            'date',
+            'excerpt',
         ],
-        "fieldsToExclude": [
-            "documenttype",
-            "size"
+        'fieldsToExclude': [
+            'documenttype',
+            'size'
         ],
-        "debug": false,
-        "viewAllContent": true,
-        "numberOfResults": numberOfResults,
-        "pipeline": process.env.COVEO_PIPELINE || "default",
-        "context": {
-            "userName": message.user,
+        'debug': false,
+        'viewAllContent': true,
+        'numberOfResults': numberOfResults,
+        'pipeline': process.env.COVEO_PIPELINE || 'default',
+        'context': {
+            'userName': message.user,
         },
-        "facets": []
+        'facets': []
     };
     return request({
-        "method": "POST",
-        "url": endPoint,
+        'method': 'POST',
+        'url': endPoint,
         headers: {
             'accept': 'application/json',
-            'Authorization': 'Bearer ' + process.env.COVEO_API_KEY,
+            'Authorization': 'Bearer ' + COVEO_API_KEY,
             'Content-Type': 'application/json'
         },
-        "body": JSON.stringify(searchBody)
+        'body': JSON.stringify(searchBody)
     },
         (err, httpResponse, body) => {
             if (err) {
                 console.log('ERROR: ', err);
-                throw new Error(`getCoveoResults failed: "${err}"`);
+                throw new Error(`getCoveoResults failed: '${err}'`);
             }
-            console.log('getCoveoResults response code: ', httpResponse.statusCode);
-            // Uncomment is you wan to see the result body
-            // console.log('getCoveoResults response body: ', httpResponse.body);
         })
 };
 
@@ -114,7 +118,7 @@ const getSsmParam = async (name) => {
     await setupListenner(app);
 
     await app.start(process.env.PORT || 3000);
-    console.log("⚡️ Bolt app is running!");
+    console.log('⚡️ Bolt app is running!');
 })().catch((e) => {
     console.log(e);
 });

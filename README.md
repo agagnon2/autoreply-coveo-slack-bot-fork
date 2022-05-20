@@ -62,6 +62,20 @@ Slack will send the new message event to the AWS Lambda code, which will only tr
 - Users:read
 - Users:read.email
 
+### Local debugging
+1.To activate local debugging, you need to enable the Socket Mode in the application menu (found at https://api.slack.com/apps/$YOUR_APP_ID), in the `Socket Mode` menu under `Settings`.  This will redirect your app events over a WebSockets connection.
+2.In your terminal, run `npm run dev`, which will run the `app.js` code and hotreload your code.
+3. When you are satisfy with your `app.js` code, update your `lambdaApp.js` code so it's working the same way. Make sure to follow the `Updating the lambdaApp code from the app.js code` to make sure it will be deployed flawlessly
+
+
+### Updating the lambdaApp code from the app.js code
+When you are satisfy with your `app.js` changes, you will need to move those changes to the `lambdaApp.js` so the lambda uses it. There is some difference between the `app.js` file and the `lambdaApp.js` that requires to stay untouched :
+1. The `lambdaApp.js` code header **needs** to import the AwsLambdaReceiver module be triggered
+![image](https://user-images.githubusercontent.com/73175206/169601370-bbc6862c-a9e5-4ca8-8ec5-6919a7da065d.png)
+
+3. The `lambdaApp.js` code footer **needs** to have the AwsLambdaReceiver in the app creation statement. Also, since it does not use the socket mode, it only needs the SLACK_BOT_TOKEN versus the `app.js` which needs the `SLACK_SIGNING_SECRET`, the `SLACK_APP_TOKEN` and the socketMode set to true. Lastly, the `module.exports.handler`is required for the lambda to work, so make sure to 
+![image](https://user-images.githubusercontent.com/73175206/169601380-058ff28b-86a2-439e-b6a9-c88304cbfd18.png)
+
 ## References
 
 - [Coveo Search API](https://developers.coveo.com/display/CloudPlatform/Search+API)

@@ -14,7 +14,7 @@ This project describes how to integrate Coveo auto-answering capabilities in Sla
 
 In Slack, in a channel where the bot will have been previously added, users asking a question will receive an answer based on the top Coveo Search answers. The trigger in this project is a question mark, but that can be easily changed.
 
-Slack will send the new message event to the AWS Lambda code, which will only trigger and respond if there is a question mark in the text field, and if so, will send a query to Coveo based on the keywords in the said text. The top 3 results are returned to Slack.
+Slack will send the new message event to the AWS Lambda code, which will only trigger and respond if there is a question mark in the text field, and if so, will send a query to Coveo based on the keywords in the said text. The top 3 results will then be returned to Slack.
 
 
 ## Instructions

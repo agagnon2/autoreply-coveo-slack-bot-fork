@@ -31,7 +31,7 @@ Slack will send the new message event to the AWS Lambda code, which will only tr
 #### Create the Parameter Store Folder for your App 
   * Navigate to the Parameter Store landing page, and click on `Create parameter`
   ![image](https://user-images.githubusercontent.com/73175206/169589442-634442dc-bcf2-4297-a1bb-6aea7ac0a8a1.png)
-  * Create a new name path for your application.For this example, we used the following path `/rd/coveo-autoreply-bot` with the parameter name `COVEO_API_KEY`. Make sure to give a unique path to your app related tokens as we will need to give restricted acces to those token later on in the configuration. Also make sure to select the `SecureString` type for the parameter. 
+  * Create a new name path for your application. For this example, we used the following path `/rd/coveo-autoreply-bot` with the parameter name `COVEO_API_KEY`. Make sure to give a unique path to your app-related tokens as we will need to give our Lambda restricted access to it later in the configuration. Also, make sure to select the `SecureString` type for the parameter. 
 
 ![image](https://user-images.githubusercontent.com/73175206/169590874-82349425-21d3-4ed1-9b98-aee689e983dc.png)
   * Submit by clicking on `Create parameter`

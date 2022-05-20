@@ -7,7 +7,7 @@ This project describes how to integrate Coveo auto-answering capabilities in Sla
 * __Coveo Impersonation__ - key for the authentication against the platform (currently only fetching public documents based on the query pipeline).
 * __Slack Admin__ access to add a new Application.
 * __AWS Lambda__ - runs your NodeJs code that will interact with the Coveo platform without provisioning or managing infrastructure.
-* __AWS Parameter Store__- stores the search token cache (the app token needs consist of: Slack App token, Slack Bot token and the Slack Signing Secret).
+* __AWS Parameter Store__- stores the search token cache (the app token needs consist of: The Coveo APi Key,  Slack App token, Slack Bot token and the Slack Signing Secret).
 * __AWS API Gateway__, - points to the above AWS Lambda function.
 
 ## How it works

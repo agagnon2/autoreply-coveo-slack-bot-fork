@@ -19,7 +19,8 @@ const slackConfig = {
 const setupListenner = async (app) => {
     // Listens to incoming messages that contain "?"
     app.message('?', async ({ message, say }) => {
-        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text))
+        const COVEO_API_KEY = await getSsmParam('COVEO_API_KEY')
+        const results = formatCoveoResults(await getCoveoSearchResults(message, message.text, COVEO_API_KEY))
 
         if (results && results != "") {
             await say({
@@ -45,7 +46,7 @@ const truncate = (str, num) => {
     return str.slice(0, num) + '...'
 }
 
-const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
+const getCoveoSearchResults = (message, query, COVEO_API_KEY, numberOfResults = 3) => {
     const endPoint = `${process.env.COVEO_ENDPOINT}/rest/search/v2/?organizationId=${process.env.COVEO_ORG}`;
     let searchBody = {
         "q": query,
@@ -73,7 +74,7 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
         "url": endPoint,
         headers: {
             'accept': 'application/json',
-            'Authorization': 'Bearer ' + process.env.COVEO_API_KEY,
+            'Authorization': 'Bearer ' + COVEO_API_KEY,
             'Content-Type': 'application/json'
         },
         "body": JSON.stringify(searchBody)
@@ -83,9 +84,6 @@ const getCoveoSearchResults = (message, query, numberOfResults = 3) => {
                 console.log('ERROR: ', err);
                 throw new Error(`getCoveoResults failed: "${err}"`);
             }
-            console.log('getCoveoResults response code: ', httpResponse.statusCode);
-            // Uncomment is you wan to see the result body
-            // console.log('getCoveoResults response body: ', httpResponse.body);
         })
 };
 

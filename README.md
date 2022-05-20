@@ -62,10 +62,24 @@ Slack will send the new message event to the AWS Lambda code, which will only tr
 - Users:read
 - Users:read.email
 
+### AWS automated App creation with Serverless
+The `serverless.yaml` file, in conjunction wit the `handler.js` and `lambdaApp.js` are the one that will be used by your AWS Lambda when deployed. For development ease, we will let serverless create an App using a CloudFormation template. The template will include :
+* A s3 bucket to store and versioned your deployed App
+* A Lambda function 
+* A Gateway Rest API to access the Lambda 
+* A Log Group to monitor your App
+
+![image](https://user-images.githubusercontent.com/73175206/169595350-25b0fd07-0a97-4f5e-8d62-117f3fb695cc.png)
+
+To deploy your App (which will use the `lambdaApp.js` file) simply run `npm run dev`
+
+Warning : At first, your lambda will not have access to your parameter store so you will need to give it permission (In progess)
+
 ### Local debugging
-1.To activate local debugging, you need to enable the Socket Mode in the application menu (found at https://api.slack.com/apps/$YOUR_APP_ID), in the `Socket Mode` menu under `Settings`.  This will redirect your app events over a WebSockets connection.
-2.In your terminal, run `npm run dev`, which will run the `app.js` code and hotreload your code.
+1. To activate local debugging, you need to enable the Socket Mode in the application menu (found at https://api.slack.com/apps/$YOUR_APP_ID), in the `Socket Mode` menu under `Settings`.  This will redirect your app events over a WebSockets connection.
+2. In your terminal, run `npm run dev`, which will run the `app.js` code and hotreload your code.
 3. When you are satisfy with your `app.js` code, update your `lambdaApp.js` code so it's working the same way. Make sure to follow the `Updating the lambdaApp code from the app.js code` to make sure it will be deployed flawlessly
+
 
 
 ### Updating the lambdaApp code from the app.js code
@@ -75,6 +89,8 @@ When you are satisfy with your `app.js` changes, you will need to move those cha
 
 3. The `lambdaApp.js` code footer **needs** to have the AwsLambdaReceiver in the app creation statement. Also, since it does not use the socket mode, it only needs the SLACK_BOT_TOKEN versus the `app.js` which needs the `SLACK_SIGNING_SECRET`, the `SLACK_APP_TOKEN` and the socketMode set to true. Lastly, the `module.exports.handler`is required for the lambda to work, so make sure to 
 ![image](https://user-images.githubusercontent.com/73175206/169601380-058ff28b-86a2-439e-b6a9-c88304cbfd18.png)
+
+
 
 ## References
 

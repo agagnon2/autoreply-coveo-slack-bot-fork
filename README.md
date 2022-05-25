@@ -75,6 +75,21 @@ To deploy your App (which will use the `lambdaApp.js` file) simply run `npm run 
 
 Warning : At first, your lambda will not have access to your parameter store so you will need to give it permission (In progess)
 
+#### Add a policy to the lambda function to gain access to your parameters
+1. Open the AWS Lambda console and click on your function's name
+2. Click on the `Configuration` tab and then click `Permissions`
+3. Click on the Execution role name
+![image](https://user-images.githubusercontent.com/73175206/170342304-3cd0f4dc-b8c4-4c57-b0f9-89371d902d56.png)
+
+4. In the permission policies section, click on `Add permissions` and then click `Create inline policy`
+![image](https://user-images.githubusercontent.com/73175206/170343460-21fd0a8b-7f13-40a1-abb2-93fbcd536189.png)
+
+5. With the Visual Editor, select `System Manager`as the Service,  `GetParameter` as the Action and the path to your application parameter folder followed by `/*` for the ressources. The review policy should look like this : 
+![image](https://user-images.githubusercontent.com/73175206/170346497-7d74c42f-9687-4c3c-9cd7-029977c80d4d.png)
+
+4. Click on `Create policy` when completed
+
+
 ### Local debugging
 1. To activate local debugging, you need to enable the Socket Mode in the application menu (found at https://api.slack.com/apps/$YOUR_APP_ID), in the `Socket Mode` menu under `Settings`.  This will redirect your app events over a WebSockets connection.
 2. In your terminal, run `npm run dev`, which will run the `app.js` code and hotreload your code.
@@ -89,8 +104,6 @@ When you are satisfy with your `app.js` changes, you will need to move those cha
 
 3. The `lambdaApp.js` code footer **needs** to have the AwsLambdaReceiver in the app creation statement. Also, since it does not use the socket mode, it only needs the SLACK_BOT_TOKEN versus the `app.js` which needs the `SLACK_SIGNING_SECRET`, the `SLACK_APP_TOKEN` and the socketMode set to true. Lastly, the `module.exports.handler`is required for the lambda to work, so make sure to 
 ![image](https://user-images.githubusercontent.com/73175206/169601380-058ff28b-86a2-439e-b6a9-c88304cbfd18.png)
-
-
 
 ## References
 

@@ -71,22 +71,32 @@ The `serverless.yaml` file, in conjunction wit the `handler.js` and `lambdaApp.j
 * A Gateway Rest API to access the Lambda 
 * A Log Group to monitor your App
 
+_If you want to change the service name of your app(defaulted at autorepply-coveo-slack-bot), you can do it on the first line of the yaml file._
+
 ![image](https://user-images.githubusercontent.com/73175206/169595350-25b0fd07-0a97-4f5e-8d62-117f3fb695cc.png)
 
 To deploy your App (which will use the `lambdaApp.js` file) simply run `npm run dev`
 
 Warning : At first, your lambda will not have access to your parameter store so you will need to give it permission (In progess)
 
+#### Copy your Gateway API endpoint in the slack app
+Now that your app is deployed to AWS, you will need to update the Slack App Urls.
+1. To find the Gateway API, you can find it in your terminal after having deployed your serverless app or in the AWS console **PIC NEEDED** . Find it and copy it
+2. In your Slack app, navigate to the Events request URL under the `Event Subscription`. Copy the gateway URL. it should mark as succeeded*?
+
 #### Add a policy to the lambda function to gain access to your parameters
 1. Open the AWS Lambda console and click on your function's name
 2. Click on the `Configuration` tab and then click `Permissions`
 3. Click on the Execution role name
+
 ![image](https://user-images.githubusercontent.com/73175206/170342304-3cd0f4dc-b8c4-4c57-b0f9-89371d902d56.png)
 
 4. In the permission policies section, click on `Add permissions` and then click `Create inline policy`
+
 ![image](https://user-images.githubusercontent.com/73175206/170343460-21fd0a8b-7f13-40a1-abb2-93fbcd536189.png)
 
 5. With the Visual Editor, select `System Manager`as the Service,  `GetParameter` as the Action and the path to your application parameter folder followed by `/*` for the ressources. The review policy should look like this : 
+
 ![image](https://user-images.githubusercontent.com/73175206/170346497-7d74c42f-9687-4c3c-9cd7-029977c80d4d.png)
 
 4. Click on `Create policy` when completed

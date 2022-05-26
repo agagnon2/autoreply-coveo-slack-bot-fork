@@ -10,12 +10,11 @@ const ssmClient = new AWS.SSM({
 });
 
 /** 
- * This awsLambdaReceiver initialization  should not be changed as it is neede for the AWS Lambda to work 
+ * This awsLambdaReceiver initialization  should not be changed as it is needed for the AWS Lambda to work 
  */
 const awsLambdaReceiver = new AwsLambdaReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
-
 
 // Slack message configuration 
 const slackConfig = {
@@ -109,7 +108,7 @@ const getSsmParam = async (name) => {
 }
 
 /** 
- * This async function should not be changed as it is neede for the AWS Lambda to work 
+ * This async function should not be changed as it is needed for the AWS Lambda to work 
  */
 (async () => {
     // Get the tokens from the param store
@@ -130,6 +129,9 @@ const getSsmParam = async (name) => {
     console.log(e);
 });
 
+/** 
+ * This module.exports.handler statement should not be changed as it is needed for the AWS Lambda to work 
+ */
 // Handle the Lambda function event, do not remove!
 module.exports.handler = async (event, context, callback) => {
     const handler = await awsLambdaReceiver.start();

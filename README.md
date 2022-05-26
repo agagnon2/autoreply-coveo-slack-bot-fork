@@ -81,8 +81,19 @@ Warning : At first, your lambda will not have access to your parameter store so 
 
 #### Copy your Gateway API endpoint in the slack app
 Now that your app is deployed to AWS, you will need to update the Slack App Urls.
-1. To find the Gateway API, you can find it in your terminal after having deployed your serverless app or in the AWS console **PIC NEEDED** . Find it and copy it
-2. In your Slack app, navigate to the Events request URL under the `Event Subscription`. Copy the gateway URL. it should mark as succeeded*?
+1. Get your API Gateway endpoint URL.To do so , you can find it:
+- In your terminal after having deployed your serverless app or in the AWS console. When found, copy it.
+
+![image](https://user-images.githubusercontent.com/73175206/170576029-977484d5-4bfb-4ec6-8706-92255e97db8f.png)
+
+- In the AWS console by browsing to the Lambda landing page and clicking on the `Functions` side menu and then click on your function name. You should see the API Gateway in the trigger section of your function overview. By clicking on it, you should see the trigger appear with an API endpoint listed. Copy it.
+
+![image](https://user-images.githubusercontent.com/73175206/170577519-5adbc20b-48da-433b-975c-3e5194041f20.png)
+
+2. Go back to your Slack App setup and navigate to the Events request URL under the `Event Subscription`. Paste the gateway URL. it should mark as `Verified`.
+
+![image](https://user-images.githubusercontent.com/73175206/170577720-23969988-b32f-4aa1-b2f0-da949de172d6.png)
+
 
 #### Add a policy to the lambda function to gain access to your parameters
 1. Open the AWS Lambda console and click on your function's name

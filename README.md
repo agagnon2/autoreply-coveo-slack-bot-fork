@@ -19,6 +19,9 @@ Slack will send the new message event to the AWS Lambda code, which will only tr
 
 ## Instructions
 
+### Create your .env file 
+For the publically available variables needed for our application to work, we will add a `.env` file at the root of our repo. You can copy the env.example content and fill the right side of the variables with the AWS region (default in North-America would be `us-east-1` but make sure to confirm this in your AWS console) and the Coveo-related properties. The Coveo pipeline is optional and will use `default` if empty.
+
 ### Create Impersonation key in Coveo platform
 
 1. [Read more on Impersonation](https://docs.coveo.com/en/1707/manage-an-organization/privilege-reference#search-impersonate-domain)

@@ -22,48 +22,47 @@ Slack will send the new message event to the AWS Lambda code, which will only tr
 ### Create your .env file 
 For the publically available variables needed for our application to work, we will add a `.env` file at the root of our repo. You can copy the env.example content and fill the right side of the variables with the AWS region (default in North-America would be `us-east-1` but make sure to confirm this in your AWS console) and the Coveo-related properties. The Coveo pipeline is optional and will use `default` if empty.
 
+
+
 ### Create Impersonation key in Coveo platform
 
-1. [Read more on Impersonation](https://docs.coveo.com/en/1707/manage-an-organization/privilege-reference#search-impersonate-domain)
-2. [Create a Key](https://docs.coveo.com/en/82). Make sure you add `Search - Impersonation`, `Analytics - Data, Push` and `Analytics - Impersonate`.
-
+Before creating our API key, let's setup our AWS parameter store to store it. 
+   
+#### Create a AWS Parameter Store Folder for your App 
+  1. Navigate to the Parameter Store landing page, and click on `Create parameter`
+  ![image](https://user-images.githubusercontent.com/73175206/169589442-634442dc-bcf2-4297-a1bb-6aea7ac0a8a1.png)
+  2. Create a new name path for your application. For this example, we used the following path `/rd/coveo-autoreply-bot` with the parameter name `COVEO_API_KEY`. Make sure to give a unique path to your app-related tokens as we will need to give our Lambda restricted access to it later in the configuration. Also, make sure to select the `SecureString` type for the parameter. 
+  
+  #### Now that we are ready to create our secure parameter, let's create ou Coveo API KEY :
+  
+1. In another tab, navigate to your Coveo platform and [create a Key](https://docs.coveo.com/en/82). Make sure you add `Search - Impersonation`, `Analytics - Data, Push` and `Analytics - Impersonate`. 
+[_More on the impersonate Privilege and it's danger](https://docs.coveo.com/en/1707/manage-an-organization/privilege-reference#search-impersonate-domain)
+3. When generating the key, copy it in the parameter store and submit by clicking on `Create parameter`
    **_Keep that key private!!!_**
 
-   Insert it only in the AWS Parameter Store  
-
-#### Create the Parameter Store Folder for your App 
-  * Navigate to the Parameter Store landing page, and click on `Create parameter`
-  ![image](https://user-images.githubusercontent.com/73175206/169589442-634442dc-bcf2-4297-a1bb-6aea7ac0a8a1.png)
-  * Create a new name path for your application. For this example, we used the following path `/rd/coveo-autoreply-bot` with the parameter name `COVEO_API_KEY`. Make sure to give a unique path to your app-related tokens as we will need to give our Lambda restricted access to it later in the configuration. Also, make sure to select the `SecureString` type for the parameter. 
-
 ![image](https://user-images.githubusercontent.com/73175206/169590874-82349425-21d3-4ed1-9b98-aee689e983dc.png)
-  * Submit by clicking on `Create parameter`
+
 
 ### Create a Slack app
 
-1. As an admin in the Slack workspace, use _Create an App_
-2. Create the app
-3. Navigate to App's Home
-4. In the `Show Tabs` section, enable `Home Tab`.
-5. Disable the `Messages Tab`.
-6. Navigate to `Basic Information`.
-7. Navigate to `App Credentials`.
-8. Show the `Signing Secret` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_SIGNING_SECRET` as the parameter name.
-9.  Navigate to `App-Level Tokens`.
-10. Click on `Generate Token and Scopes` 
-11. Add both `connections:write` and `authorization:read` scopes to your token. Give it a name and Generate it
-12. When done, it should display the token. Copy it and store it in your Parameter Store. For this example, we used `SLACK_APP_TOKEN` as the parameter name.
-13. Navigate to `OAuth & Permissions`.
-14. Copy the `Bot User OAuth Token` under the `OAuth Tokens for Your Workspace` section and store it in your Parameter Store. For this example, we used `SLACK_BOT_TOKEN` as the attribute name.
-15. Enable the following permissions in the `Scopes`` section:
-- Channels:history
-- Commands
-- Groups:history
-- Im:history
-- Mpim:history
-- Users:profile.read
-- Users:read
-- Users:read.email
+1. As an admin in the Slack workspace, navigate to https://api.slack.com/ and click on  _Create an App_. 2 choices will be gioven to you : `From scratch` or `From an app manifest`. Select `From an app manifest`.
+
+#### From an app manifest
+2. Select the workspace where the app should be create and click `Next` 
+3. Copy the `manifestExample.yml` file into the manisfest configuration. If you want a custom name, make sure to change the `display_information -> name:` and the `bot_user -> display_name:`. Click on `Next`
+4. Review the OAuth scopes, features and settings and click on `Create`
+5. You App is now created. The Events request URL under the `Event Subscription` will not work at this time but it's normal, we will need to setup AWS to generate a proper request URL in the next section
+
+#### Store the confidential tokens in your parameter store, with the `SecureString` type 
+3. Navigate to `Basic Information`.
+4. Navigate to `App-Level Tokens`.
+5. Click on `Generate Token and Scopes` 
+6. Add both `connections:write` and `authorization:read` scopes to your token. Give it a name and Generate it. Copy the token starting with `xapp` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_APP_TOKEN` as the parameter name.
+5. Navigate to `App Credentials`.
+6. Show the `Signing Secret` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_SIGNING_SECRET` as the parameter name.
+7.  Navigate to `OAuth & Permissions`.
+8.  Copy the `Bot User OAuth Token` under the `OAuth Tokens for Your Workspace` section and store it in your Parameter Store. For this example, we used `SLACK_BOT_TOKEN` as the attribute name.
+
 
 ### AWS automated App creation with Serverless
 The `serverless.yaml` file, in conjunction wit the `handler.js` and `lambdaApp.js` are the one that will be used by your AWS Lambda when deployed. For development ease, we will let serverless create an App using a CloudFormation template. The template will include :

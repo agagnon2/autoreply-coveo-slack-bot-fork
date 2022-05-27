@@ -29,9 +29,9 @@ For the publically available variables needed for our application to work, we wi
 Before creating our API key, let's set up our AWS parameter store to store it. 
    
 #### Create an AWS Parameter Store Folder for your App 
-  1. Navigate to the Parameter Store landing page, and click on `Create parameter`
+1. Navigate to the Parameter Store landing page, and click on `Create parameter`.
   ![image](https://user-images.githubusercontent.com/73175206/169589442-634442dc-bcf2-4297-a1bb-6aea7ac0a8a1.png)
-  2. Create a new name path for your application. For this example, we used the following path `/rd/coveo-autoreply-bot` with the parameter name `COVEO_API_KEY`. Make sure to give a unique path to your app-related tokens so we can give our Lambda restricted access to it later in the configuration. Also, make sure to select the `SecureString` type for the parameter. 
+2. Create a new name path for your application. For this example, we used the following path `/rd/coveo-autoreply-bot` with the parameter name `COVEO_API_KEY`. Make sure to give a unique path to your app-related tokens so we can give our Lambda restricted access to it later in the configuration. Also, make sure to select the `SecureString` type for the parameter. 
  
  We don't have a value to store yet so we will generate an API Key.
   
@@ -51,23 +51,23 @@ Before creating our API key, let's set up our AWS parameter store to store it.
 1. As an admin in the Slack workspace, navigate to https://api.slack.com/ and click on  _Create an App_. 2 choices will be given to you: `From scratch` or `From an app manifest`. Select `From an app manifest`.
 
 #### From an app manifest
-2. Select the workspace where the app should be created and click `Next` 
-3. Copy the `manifestExample.yml` file into the manifest configuration. If you want a custom name, make sure to change the `display_information -> name:` and the `bot_user -> display_name:`. Click on `Next`
-4. Review the OAuth scopes, features and settings and click on `Create`
-5. You App is now created. The Events request URL under the `Event Subscription` will not work at this time but it's normal, we will need to set up AWS to generate a proper request URL in the next section
+2. Select the workspace where the app should be created and click `Next`. 
+3. Copy the `manifestExample.yml` file into the manifest configuration. If you want a custom name, make sure to change the `display_information -> name:` and the `bot_user -> display_name:`. Click on `Next`.
+4. Review the OAuth scopes, features and settings and click on `Create`.
+5. You App is now created. The Events request URL under the `Event Subscription` will not work at this time but it's normal, we will need to set up AWS to generate a proper request URL in the next section.
 
 #### Store the confidential tokens in your parameter store, with the `SecureString` type 
 3. Navigate to `Basic Information`.
 4. Navigate to `App-Level Tokens`.
-5. Click on `Generate Token and Scopes` 
+5. Click on `Generate Token and Scopes`. 
 6. Add both `connections:write` and `authorization:read` scopes to your token. Give it a name and Generate it. Copy the token starting with `xapp` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_APP_TOKEN` as the parameter name.
 5. Navigate to `App Credentials`.
-6. Show the `Signing Secret` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_SIGNING_SECRET` as the parameter name.
+6. Show the `Signing Secret` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_SIGNING_SECRET` as the parameter. name.
 7.  Navigate to `OAuth & Permissions`.
 8.  Copy the `Bot User OAuth Token` under the `OAuth Tokens for Your Workspace` section and store it in your Parameter Store. For this example, we used `SLACK_BOT_TOKEN` as the attribute name.
 
 
-### AWS automated App creation with Serverless
+### Create a Lambda Application automatically with Serverless
 The `serverless.yaml` file, in conjunction with the `handler.js` and `lambdaApp.js` are the ones that will be used by your AWS Lambda when deployed. For development ease, we will let serverless create an App using a CloudFormation template. The template will include :
 * An s3 bucket to store and versioned your deployed App
 * A Lambda function 
@@ -83,13 +83,13 @@ To deploy your app (which will use the `lambdaApp.js` file) simply run `npm run 
 Warning: At first, your lambda will not have access to your parameter store so you will need to give it permission (In progress)
 
 #### Add a policy to the lambda function to gain access to your parameters
-1. Open the AWS Lambda console and click on your function's name
-2. Click on the `Configuration` tab and then click `Permissions`
-3. Click on the Execution role name
+1. Open the AWS Lambda console and click on your function's name.
+2. Click on the `Configuration` tab and then click `Permissions`.
+3. Click on the Execution role name.
 
 ![image](https://user-images.githubusercontent.com/73175206/170342304-3cd0f4dc-b8c4-4c57-b0f9-89371d902d56.png)
 
-4. In the permission policies section, click on `Add permissions` and then click `Create inline policy`
+4. In the permission policies section, click on `Add permissions` and then click `Create inline policy`.
 
 ![image](https://user-images.githubusercontent.com/73175206/170343460-21fd0a8b-7f13-40a1-abb2-93fbcd536189.png)
 
@@ -114,25 +114,36 @@ Now that your app is deployed to AWS, you will need to update the Slack App URLs
 
 ![image](https://user-images.githubusercontent.com/73175206/170577720-23969988-b32f-4aa1-b2f0-da949de172d6.png)
 
+### Install your slack app to your Workspace
+1. Go to your Slack App setup and navigate to the `Basic Information`.
+2. Click on `Install to Workplace`. 
+3. Confirm the information and the destination Workplace and click on `Allow`.
+
+![image](https://user-images.githubusercontent.com/73175206/170743450-ee740107-9d4d-436d-8364-e03df5093e6a.png)
+
 ### Local debugging
 1. To activate local debugging, you need to enable the Socket Mode in the application menu (found at https://api.slack.com/apps/$YOUR_APP_ID), in the `Socket Mode` menu under `Settings`.  This will redirect your app events over a WebSockets connection.
-2. In your terminal, run `npm run dev`, which will run the `app.js` code and hot-reload your code.
-3. When you are satisfied with your `app.js` code, update your `lambdaApp.js` code so it's working the same way. Make sure to follow the next section to make sure it will be deployed properly
+![image](https://user-images.githubusercontent.com/73175206/170737886-744fe41c-c4b4-46a2-b3ed-267ef781e81b.png)
+
+3. In your terminal, run `npm run dev`, which will run the `app.js` code, which is setup to work with the SocketMode and hot-reload your code.
+4. You can now change your bot behavior with a live result. 
+5. When you are satisfied with your `app.js` code, update your `lambdaApp.js` code so it's working the same way. Make sure to follow the next section to make sure it will be deployed properly.
 
 
 ### Updating the lambdaApp code from the app.js code
 When you are satisfied with your `app.js` changes, you will need to move those changes to the `lambdaApp.js` so the lambda uses it. There is some difference between the `app.js` file and the `lambdaApp.js` that requires to stay untouched :
-1. The `lambdaApp.js` code header **needs** to import the AwsLambdaReceiver module to be triggered
+1. The `lambdaApp.js` code header **needs** to import the AwsLambdaReceiver module to be triggered.
+
 ![image](https://user-images.githubusercontent.com/73175206/169601370-bbc6862c-a9e5-4ca8-8ec5-6919a7da065d.png)
 
-3. The `lambdaApp.js` code footer **needs** to have the AwsLambdaReceiver in the app creation statement. Also, since it does not use the socket mode, it only needs the SLACK_BOT_TOKEN versus the `app.js` which needs the `SLACK_SIGNING_SECRET`, the `SLACK_APP_TOKEN` and the socketMode set to true. Lastly, the `module.exports.handler`is required for the lambda to work, so make sure to 
+3. The `lambdaApp.js` code footer **needs** to have the AwsLambdaReceiver in the app creation statement. Also, since it does not use the socket mode, it only needs the SLACK_BOT_TOKEN versus the `app.js` which needs the `SLACK_SIGNING_SECRET`, the `SLACK_APP_TOKEN` and the socketMode set to true. Lastly, the `module.exports.handler`is required for the lambda to work, so make sure to keep it.
+
 ![image](https://user-images.githubusercontent.com/73175206/169601380-058ff28b-86a2-439e-b6a9-c88304cbfd18.png)
 
 ## References
 
 - [Coveo Search API](https://developers.coveo.com/display/CloudPlatform/Search+API)
-- [Slack Integration how-to](https://docs.api.ai/docs/slack-integration)
-- [Slack + Webhook Integration Example from API.ai](https://docs.api.ai/docs/slack-webhook-integration-guideline)
+- [Deploying to AWS Lambda - Slack doc](https://slack.dev/bolt-js/deployments/aws-lambda)
 ### Other Useful documentation links:
 
 - https://github.com/coveo/Coveo-Coveo-Slack-Integration 

@@ -35,7 +35,7 @@ Before creating our API key, let's set up our AWS parameter store to store it.
  
  We don't have a value to store yet so we will generate an API Key.
   
-  #### Now that we are ready to create our secure parameter, let's create ou Coveo API KEY :
+  #### Now that we are ready to create our secure parameter, let's create our Coveo API KEY :
   
 1. In another tab, navigate to your Coveo platform and [create a Key](https://docs.coveo.com/en/1718/manage-an-organization/manage-api-keys#add-an-api-key). Make sure you add `Search - Impersonation`, `Analytics - Data, Push` and `Analytics - Impersonate`. 
 [_More on the impersonate Privilege and its danger_](https://docs.coveo.com/en/1707/manage-an-organization/privilege-reference#search-impersonate-domain)
@@ -48,19 +48,19 @@ Before creating our API key, let's set up our AWS parameter store to store it.
 
 ### Create a Slack app
 
-1. As an admin in the Slack workspace, navigate to https://api.slack.com/ and click on  _Create an App_. 2 choices will be given to you: `From scratch` or `From an app manifest`. Select `From an app manifest`.
+As an admin in the Slack workspace, navigate to https://api.slack.com/ and click on  _Create an App_. 2 choices will be given to you: `From scratch` or `From an app manifest`. Select `From an app manifest`.
 
 #### From an app manifest
-2. Select the workspace where the app should be created and click `Next`. 
-3. Copy the `manifestExample.yml` file into the manifest configuration. If you want a custom name, make sure to change the `display_information -> name:` and the `bot_user -> display_name:`. Click on `Next`.
-4. Review the OAuth scopes, features and settings and click on `Create`.
-5. You App is now created. The Events request URL under the `Event Subscription` will not work at this time but it's normal, we will need to set up AWS to generate a proper request URL in the next section.
+1. Select the workspace where the app should be created and click `Next`. 
+2. Copy the `manifestExample.yml` file into the manifest configuration. If you want a custom name, make sure to change the `display_information -> name:` and the `bot_user -> display_name:`. Click on `Next`.
+3. Review the OAuth scopes, features and settings and click on `Create`.
+4. You App is now created. The Events request URL under the `Event Subscription` will not work at this time but it's normal, we will need to set up AWS to generate a proper request URL in the next section.
 
 #### Store the confidential tokens in your parameter store, with the `SecureString` type 
-3. Navigate to `Basic Information`.
-4. Navigate to `App-Level Tokens`.
-5. Click on `Generate Token and Scopes`. 
-6. Add both `connections:write` and `authorization:read` scopes to your token. Give it a name and Generate it. Copy the token starting with `xapp` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_APP_TOKEN` as the parameter name.
+1. Navigate to `Basic Information`.
+2. Navigate to `App-Level Tokens`.
+3. Click on `Generate Token and Scopes`. 
+4. Add both `connections:write` and `authorization:read` scopes to your token. Give it a name and Generate it. Copy the token starting with `xapp` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_APP_TOKEN` as the parameter name.
 5. Navigate to `App Credentials`.
 6. Show the `Signing Secret` and store it in your Parameter Store with the same prefix path as before. For this example, we used `SLACK_SIGNING_SECRET` as the parameter. name.
 7.  Navigate to `OAuth & Permissions`.
@@ -126,7 +126,7 @@ Now that your app is deployed to AWS, you will need to update the Slack App URLs
 ![image](https://user-images.githubusercontent.com/73175206/170737886-744fe41c-c4b4-46a2-b3ed-267ef781e81b.png)
 
 3. In your terminal, run `npm run dev`, which will run the `app.js` code, which is setup to work with the SocketMode and hot-reload your code.
-4. You can now change your bot behavior with a live result. 
+4. You can now change your bot behaviour with a live result. 
 5. When you are satisfied with your `app.js` code, update your `lambdaApp.js` code so it's working the same way. Make sure to follow the next section to make sure it will be deployed properly.
 
 

@@ -35,7 +35,7 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react": "7.30.0",
     "eslint-plugin-react-hooks": "4.6.0",
-    "nodemon": "2.0.16",
+    "nodemon": "2.0.19",
     "serverless-offline": "8.8.0"
   }
 }
